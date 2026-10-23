@@ -12,3 +12,5 @@ target_link_libraries(app PRIVATE nlohmann_json::nlohmann_json)
 
 set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT app)
 set_target_properties(app PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+
+include(cmake/ClangFormat.cmake)
