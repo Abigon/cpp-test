@@ -13,6 +13,11 @@ jobs:
       - name: Install Conan
         run: pip install conan
 
+      - name: Install clang-format
+        run: |
+          pip install clang-format==20.1.8
+          python -c "import sysconfig; print(sysconfig.get_path('scripts'))" >> $env:GITHUB_PATH
+
       - name: Show toolchain
         run: |
           & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property displayName
