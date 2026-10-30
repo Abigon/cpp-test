@@ -1,11 +1,13 @@
 # Targets format and format-check: single code style via clang-format.
-# clang-format ships with Visual Studio and is usually not in PATH,
-# so besides PATH we look inside installed Visual Studio directories.
+# PATH is searched first, so a pinned clang-format (pip install clang-format==<version>)
+# wins over the one bundled with Visual Studio. The second find_program call
+# looks inside Visual Studio directories only if PATH has no clang-format.
 
 file(GLOB VS_LLVM_DIRS
     "C:/Program Files/Microsoft Visual Studio/*/*/VC/Tools/Llvm/bin"
     "C:/Program Files/Microsoft Visual Studio/*/*/VC/Tools/Llvm/x64/bin")
 
+find_program(CLANG_FORMAT_EXE NAMES clang-format)
 find_program(CLANG_FORMAT_EXE NAMES clang-format HINTS ${VS_LLVM_DIRS})
 
 if(NOT CLANG_FORMAT_EXE)
