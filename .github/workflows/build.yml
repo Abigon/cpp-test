@@ -38,3 +38,11 @@ jobs:
 
       - name: Check formatting
         run: python automation/format_files.py --check
+
+      - name: Upload app
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: |
+            build/Release/app.exe
+            config.json
