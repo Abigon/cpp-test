@@ -1,9 +1,10 @@
+{% set compiler, version, compiler_exe = detect_api.detect_default_compiler() %}
 [settings]
 arch=x86_64
 build_type=Debug
-compiler=msvc
+compiler={{ compiler }}
 compiler.cppstd=23
 compiler.runtime=dynamic
 compiler.runtime_type=Debug
-compiler.version=195
+compiler.version={{ version }}
 os=Windows
