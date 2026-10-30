@@ -4,8 +4,7 @@
 #include <string>
 #include <nlohmann/json.hpp>
 
-int main()
-{
+int main(){
     std::ifstream file("config.json");
     if (!file.is_open())
     {
