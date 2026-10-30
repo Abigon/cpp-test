@@ -1,0 +1,35 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Conan
+        run: pip install conan
+
+      - name: Show toolchain
+        run: |
+          & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property displayName
+          (Get-Command clang-format).Source
+          clang-format --version
+          cmake --version
+          conan profile detect --name ci-detected
+          conan profile show -pr:h profiles/windows-msvc-debug -pr:b profiles/windows-msvc-debug
+
+      - name: Generate project files
+        run: python automation/generate_project_files.py
+
+      - name: Build Debug
+        run: python automation/build_debug.py
+
+      - name: Build Release
+        run: python automation/build_release.py
+
+      - name: Check formatting
+        run: python automation/format_files.py --check
