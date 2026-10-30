@@ -1,4 +1,3 @@
-project/profiles/windows-msvc-release:
 {% set compiler, version, compiler_exe = detect_api.detect_default_compiler() %}
 [settings]
 arch=x86_64
