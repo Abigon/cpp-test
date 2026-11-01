@@ -44,5 +44,5 @@ jobs:
         with:
           name: app-release
           path: |
-            build/Release/app.exe
+            build/bin/Release/app.exe
             config.json

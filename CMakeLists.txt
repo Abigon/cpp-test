@@ -1,16 +1,19 @@
 cmake_minimum_required(VERSION 3.25)
-project(App LANGUAGES CXX)
+project(CppCourse LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(nlohmann_json REQUIRED)
 
-add_executable(app src/main.cpp)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-target_link_libraries(app PRIVATE nlohmann_json::nlohmann_json)
+# All binaries in one place regardless of the subproject: build/bin/<Config>/
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT app)
-set_target_properties(app PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_subdirectory(src/App)
+
+set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT App)
 
 include(cmake/ClangFormat.cmake)

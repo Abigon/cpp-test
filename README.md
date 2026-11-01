@@ -18,10 +18,32 @@ python automation/build_release.py
 python automation/clean.py
 
 # 4. Запуск приложения (файл config.json читается из текущего каталога)
-.\build\Debug\app.exe
+.\build\bin\Debug\App.exe
 ```
 
 Параметры сборки и профили описаны в `automation/common.py`
+
+## Архитектура проекта
+
+Корневой `CMakeLists.txt` (решение `CppCourse`) задаёт общие настройки: стандарт C++23,
+зависимости Conan, единый каталог вывода `build/bin/<Config>/`. Сборку целей он передаёт
+подпроекту через `add_subdirectory(src/App)`.
+
+```text
+src/
+└── App/                  # subproject App
+    ├── CMakeLists.txt    # targets AppLib (STATIC) and App (executable)
+    ├── Config.h          # public interface: AppConfig, parseConfig()
+    ├── Config.cpp        # implementation: JSON parsing and validation
+    └── main.cpp          # entry point
+```
+
+- `AppLib` — статическая библиотека со всей логикой приложения: структура `AppConfig` и функция
+  `parseConfig`. Зависимость `nlohmann_json` подключена как `PRIVATE` и не видна снаружи.
+- `App` — тонкий исполняемый файл: открывает `config.json`, вызывает `parseConfig`
+  и выводит результат или сообщение об ошибке.
+
+Бинарники всех подпроектов собираются в `build/bin/<Config>/`: `AppLib.lib` и `App.exe`.
 
 ## Стиль кода
 
@@ -47,11 +69,11 @@ python automation/clean.py
 
 ### Готовая сборка
 
-Каждый успешный запуск публикует артефакт `app-release`: `build/Release/app.exe` и `config.json`.
-Скачать его можно на странице запуска во вкладке **Act или командой:
+Каждый успешный запуск публикует артефакт `app-release`: `build/bin/Release/App.exe` и `config.json`.
+Скачать его можно на странице запуска во вкладке **Actions** или командой:
 
 ```powershell
 gh run download --name app-release --dir ..\from-ci
 cd ..\from-ci
-.\build\Release\app.exe
+.\build\bin\Release\App.exe
 ```
