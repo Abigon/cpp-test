@@ -72,6 +72,9 @@ jobs:
       - name: Check formatting
         run: python automation/format_files.py --check
 
+      - name: Static analysis
+        run: python automation/run_tidy.py
+
       - name: Upload app
         uses: actions/upload-artifact@v4
         with:

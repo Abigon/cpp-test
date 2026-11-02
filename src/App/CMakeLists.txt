@@ -21,3 +21,7 @@ set_target_properties(${PROJECT_NAME}TestRunner PROPERTIES FOLDER ${PROJECT_NAME
 
 include(GoogleTest)
 gtest_discover_tests(${PROJECT_NAME}TestRunner DISCOVERY_TIMEOUT 30)
+
+set_project_warnings(${PROJECT_NAME}Lib)
+set_project_warnings(${PROJECT_NAME})
+set_project_warnings(${PROJECT_NAME}TestRunner)
