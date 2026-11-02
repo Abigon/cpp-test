@@ -36,6 +36,23 @@ jobs:
       - name: Run tests
         run: python automation/run_tests.py
 
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-report
+          path: build/test-report.xml
+
+      - name: Publish test report
+        uses: phoenix-actions/test-reporting@v10
+        if: always()
+        with:
+          name: Test results
+          path: build/test-report.xml
+          reporter: java-junit
+          output-to: step-summary
+          fail-on-error: true  
+
       - name: Build Release
         run: python automation/build_release.py
 
