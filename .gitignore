@@ -3,3 +3,5 @@ build/
 
 CMakeUserPresets.json
 __pycache__/
+
+LastCoverageResults.log

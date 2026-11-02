@@ -36,6 +36,19 @@ jobs:
       - name: Run tests
         run: python automation/run_tests.py
 
+      - name: Install OpenCppCoverage
+        run: choco install opencppcoverage -y --no-progress
+
+      - name: Measure coverage
+        run: python automation/run_coverage.py --min 70
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: build/coverage/html
+
       - name: Upload test report
         uses: actions/upload-artifact@v4
         if: always()
