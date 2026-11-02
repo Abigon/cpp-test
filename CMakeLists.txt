@@ -6,6 +6,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(nlohmann_json REQUIRED)
 
+find_package(GTest REQUIRED)
+
+enable_testing()
+
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # All binaries in one place regardless of the subproject: build/bin/<Config>/

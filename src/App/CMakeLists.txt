@@ -13,3 +13,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}Lib)
 
 set_target_properties(${PROJECT_NAME} ${PROJECT_NAME}Lib PROPERTIES FOLDER ${PROJECT_NAME})
 set_target_properties(${PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+
+# Tests: link the same library the app uses; gtest_main provides main().
+add_executable(${PROJECT_NAME}TestRunner Tests/ConfigTest.cpp)
+target_link_libraries(${PROJECT_NAME}TestRunner PRIVATE ${PROJECT_NAME}Lib GTest::gtest_main)
+set_target_properties(${PROJECT_NAME}TestRunner PROPERTIES FOLDER ${PROJECT_NAME})
+
+include(GoogleTest)
+gtest_discover_tests(${PROJECT_NAME}TestRunner DISCOVERY_TIMEOUT 30)
