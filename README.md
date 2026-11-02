@@ -52,6 +52,28 @@ src/
 - команда проверки стиля: `python automation/format_files.py --check`;
 - рекомендация включить в IDE форматирование при сохранении.
 
+## Статический анализ
+
+Проект защищён двумя барьерами: сборка с любым предупреждением компилятора
+или анализатора не проходит ни локально, ни в CI.
+
+**Предупреждения компилятора как ошибки.** Все цели (`AppLib`, `App`, `AppTestRunner`)
+собираются со строгими флагами через функцию `set_project_warnings` из
+`cmake/CompilerWarnings.cmake`:
+
+- MSVC: `/W4 /WX /permissive-`;
+- GCC/Clang: `-Wall -Wextra -Wpedantic -Werror`.
+
+**clang-tidy.** Правила анализатора заданы в `.clang-tidy` в корне проекта
+(семейства `bugprone-*`, `performance-*`, `modernize-*`, `readability-*`;
+любая находка — ошибка). Запуск:
+
+    python automation/run_tidy.py
+
+Скрипт запускает clang-tidy через MSBuild Code Analysis: MSBuild передаёт
+анализатору реальные флаги компиляции каждого файла, `compile_commands.json` не нужен.
+Обычная сборка (`build_debug.py`) анализ не запускает.
+
 ## Тесты
 
 Тесты написаны на GoogleTest и лежат в `src/App/Tests/`. Они собираются в отдельный
@@ -111,7 +133,8 @@ python automation/run_coverage.py --min 70
 - сборка конфигураций Debug и Release: `python automation/build_debug.py`, `python automation/build_release.py`;
 - запуск тестов: `python automation/run_tests.py`; отчёт публикуется в Summary запуска и сохраняется артефактом `test-report`;
 - измерение покрытия: `python automation/run_coverage.py --min 70` — сборка падает, если покрытие ниже 70%; таблица публикуется в Summary запуска, HTML-отчёт сохраняется артефактом `coverage-report`;
-- проверка стиля кода: `python automation/format_files.py --check` — сборка падает, если код не отформатирован.
+- проверка стиля кода: `python automation/format_files.py --check` — сборка падает, если код не отформатирован;
+- статический анализ: `python automation/run_tidy.py` — сборка падает при любой находке clang-tidy.
 
 Профили Conan в `profiles/` определяют версию компилятора автоматически (`detect_api`),
 поэтому одни и те же профили работают и локально, и на CI.
