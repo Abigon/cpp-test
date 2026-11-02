@@ -43,7 +43,7 @@ src/
 - `App` — тонкий исполняемый файл: открывает `config.json`, вызывает `parseConfig`
   и выводит результат или сообщение об ошибке.
 
-Бинарники всех подпроектов собираются в `build/bin/<Config>/`: `AppLib.lib` и `App.exe`.
+Бинарники всех подпроектов собираются в `build/bin/<Config>/`: `AppLib.lib`, `App.exe` и `AppTestRunner.exe`.
 
 ## Стиль кода
 
@@ -51,6 +51,28 @@ src/
 - команда автоматического исправления: `python automation/format_files.py`;
 - команда проверки стиля: `python automation/format_files.py --check`;
 - рекомендация включить в IDE форматирование при сохранении.
+
+## Тесты
+
+Тесты написаны на GoogleTest и лежат в `src/App/Tests/`. Они собираются в отдельный
+исполняемый файл `AppTestRunner`, который линкуется с той же библиотекой `AppLib`,
+что и приложение.
+
+Что проверяется — разбор конфигурационного файла функцией `parseConfig`:
+
+- корректный JSON читается в `AppConfig` (заголовок, ширина и высота окна);
+- при отсутствии ключа выбрасывается `std::runtime_error`, и в сообщении указано имя ключа;
+- при неверном типе значения выбрасывается `std::runtime_error`.
+
+Запуск:
+
+```powershell
+# Сборка Debug и запуск всех тестов через CTest (отчёт: build/test-report.xml)
+python automation/run_tests.py
+
+# Прямой запуск тестового раннера после сборки
+.\build\bin\Debug\AppTestRunner.exe
+```
 
 ## Непрерывная интеграция (CI)
 
@@ -62,6 +84,7 @@ src/
 - установка Conan 2 и `clang-format` фиксированной версии (той же, что используется локально);
 - генерация зависимостей и файлов проекта: `python automation/generate_project_files.py`;
 - сборка конфигураций Debug и Release: `python automation/build_debug.py`, `python automation/build_release.py`;
+- запуск тестов: `python automation/run_tests.py`; отчёт публикуется в Summary запуска и сохраняется артефактом `test-report`;
 - проверка стиля кода: `python automation/format_files.py --check` — сборка падает, если код не отформатирован.
 
 Профили Conan в `profiles/` определяют версию компилятора автоматически (`detect_api`),
