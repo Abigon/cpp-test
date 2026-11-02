@@ -62,7 +62,8 @@ src/
 
 - корректный JSON читается в `AppConfig` (заголовок, ширина и высота окна);
 - при отсутствии ключа выбрасывается `std::runtime_error`, и в сообщении указано имя ключа;
-- при неверном типе значения выбрасывается `std::runtime_error`.
+- при неверном типе значения выбрасывается `std::runtime_error`;
+- при синтаксически невалидном JSON выбрасывается `std::runtime_error`.
 
 Запуск:
 
@@ -73,6 +74,30 @@ python automation/run_tests.py
 # Прямой запуск тестового раннера после сборки
 .\build\bin\Debug\AppTestRunner.exe
 ```
+
+### Покрытие кода
+
+Покрытие измеряется утилитой [OpenCppCoverage](https://github.com/OpenCppCoverage/OpenCppCoverage)
+(установка: `winget install OpenCppCoverage.OpenCppCoverage`). Пересобирать проект
+со специальными флагами не нужно: используется обычная Debug-сборка и её `.pdb`.
+
+```powershell
+# Сборка Debug, запуск тестов под OpenCppCoverage и сводная таблица по файлам
+python automation/run_coverage.py
+
+# То же, но с ошибкой, если общее покрытие ниже порога
+python automation/run_coverage.py --min 70
+```
+
+Отчёты:
+
+- `build/coverage/html/index.html` — интерактивный HTML-отчёт: выполненные строки
+  подсвечены зелёным, невыполненные — красным;
+- `build/coverage/coverage.xml` — отчёт в формате Cobertura XML для CI.
+
+В CI покрытие проверяется с порогом **70%**: если оно опустится ниже, сборка упадёт.
+Порог защищает от деградации и не требует 100% — недостижимые строки
+(скобки после `throw`) не покрываются никогда.
 
 ## Непрерывная интеграция (CI)
 
@@ -85,6 +110,7 @@ python automation/run_tests.py
 - генерация зависимостей и файлов проекта: `python automation/generate_project_files.py`;
 - сборка конфигураций Debug и Release: `python automation/build_debug.py`, `python automation/build_release.py`;
 - запуск тестов: `python automation/run_tests.py`; отчёт публикуется в Summary запуска и сохраняется артефактом `test-report`;
+- измерение покрытия: `python automation/run_coverage.py --min 70` — сборка падает, если покрытие ниже 70%; таблица публикуется в Summary запуска, HTML-отчёт сохраняется артефактом `coverage-report`;
 - проверка стиля кода: `python automation/format_files.py --check` — сборка падает, если код не отформатирован.
 
 Профили Conan в `profiles/` определяют версию компилятора автоматически (`detect_api`),
