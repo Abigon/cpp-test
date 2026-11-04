@@ -1,0 +1,26 @@
+name: code-quality
+on:
+  push:
+    branches: [master]
+  pull_request:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  code-quality:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Conan
+        run: pip install conan
+      - name: Install clang-format
+        run: |
+          pip install clang-format==20.1.8
+          python -c "import sysconfig; print(sysconfig.get_path('scripts'))" >> $env:GITHUB_PATH
+      - name: Generate project files
+        run: python automation/generate_project_files.py
+      - name: Check formatting
+        run: python automation/format_files.py --check
+      - name: Static analysis
+        run: python automation/run_tidy.py

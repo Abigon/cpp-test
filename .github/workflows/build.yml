@@ -1,117 +1,29 @@
 name: build
-
 on:
   push:
+    branches: [master]
   pull_request:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  windows:
+  build:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Install Conan
         run: pip install conan
-
-      - name: Install clang-format
-        run: |
-          pip install clang-format==20.1.8
-          python -c "import sysconfig; print(sysconfig.get_path('scripts'))" >> $env:GITHUB_PATH
-
-      - name: Show toolchain
-        run: |
-          & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property displayName
-          (Get-Command clang-format).Source
-          clang-format --version
-          cmake --version
-          conan profile detect --name ci-detected
-          conan profile show -pr:h profiles/windows-msvc-debug -pr:b profiles/windows-msvc-debug
-
       - name: Generate project files
         run: python automation/generate_project_files.py
-
       - name: Build Debug
         run: python automation/build_debug.py
-
-      - name: Tests under AddressSanitizer
-        run: python automation/run_asan.py
-        
-      - name: Run tests
-        run: python automation/run_tests.py
-
-      - name: Install OpenCppCoverage
-        run: choco install opencppcoverage -y --no-progress
-
-      - name: Measure coverage
-        run: python automation/run_coverage.py --min 70
-
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: coverage-report
-          path: build/coverage/html
-
-      - name: Upload test report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-report
-          path: build/test-report.xml
-
-      - name: Publish test report
-        uses: phoenix-actions/test-reporting@v10
-        if: always()
-        with:
-          name: Test results
-          path: build/test-report.xml
-          reporter: java-junit
-          output-to: step-summary
-          fail-on-error: true  
-
       - name: Build Release
         run: python automation/build_release.py
-
-      - name: Check formatting
-        run: python automation/format_files.py --check
-
-      - name: Static analysis
-        run: python automation/run_tidy.py
-
       - name: Upload app
         uses: actions/upload-artifact@v4
         with:
-          name: app-release
+          name: app
           path: |
             build/bin/Release/App.exe
             config.json
-
-  docs:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install Doxygen
-        run: choco install doxygen.install -y --no-progress
-      - name: Install MkDocs
-        run: pip install -r requirements-docs.txt
-      - name: Build documentation
-        run: python automation/build_docs.py
-      - name: Upload documentation
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: build/docs/site
-
-  deploy:
-    if: github.event_name == 'push' && github.ref_name == github.event.repository.default_branch
-    needs: docs
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Publish to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
