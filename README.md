@@ -1,6 +1,9 @@
 # App
 
 [![build](https://github.com/Abigon/cpp-test/actions/workflows/build.yml/badge.svg)](https://github.com/Abigon/cpp-test/actions/workflows/build.yml)
+[![tests](https://github.com/Abigon/cpp-test/actions/workflows/tests.yml/badge.svg)](https://github.com/Abigon/cpp-test/actions/workflows/tests.yml)
+[![code-quality](https://github.com/Abigon/cpp-test/actions/workflows/code-quality.yml/badge.svg)](https://github.com/Abigon/cpp-test/actions/workflows/code-quality.yml)
+[![docs](https://github.com/Abigon/cpp-test/actions/workflows/docs.yml/badge.svg)](https://github.com/Abigon/cpp-test/actions/workflows/docs.yml)
 
 Учебный проект курса «Инженерный C++»: консольное приложение `App`, которое читает
 настройки из `config.json` и выводит их. Логика вынесена в статическую библиотеку
@@ -95,7 +98,7 @@ python automation/build_docs.py --serve
 
 ```text
 project/
-├── .github/workflows/   # CI pipeline (build.yml)
+├── .github/workflows/   # CI: build.yml, tests.yml, code-quality.yml, docs.yml
 ├── automation/          # Python scripts: generate, build, test, check, clean
 ├── cmake/               # CMake modules: warnings, sanitizers, clang-format
 ├── profiles/            # Conan profiles for Debug and Release
@@ -110,18 +113,21 @@ project/
 
 ## Непрерывная интеграция (CI)
 
-Сценарий `.github/workflows/build.yml` запускается на `windows-latest` при каждом
-`push` и Pull Request: генерация проекта, сборка Debug, тесты под AddressSanitizer,
-обычные тесты, покрытие с порогом 70%, сборка Release, проверка форматирования и
-статический анализ. Любой упавший шаг делает запуск красным.
+CI состоит из четырёх независимых workflow. Все они запускаются на `windows-latest`
+при `push` в `master` и при каждом Pull Request, выполняются параллельно и падают
+независимо друг от друга. У каждого свой статус и свой бейдж.
 
-Артефакты запуска:
+| Workflow | Файл | Что проверяет | Артефакты |
+|---|---|---|---|
+| `build` | `.github/workflows/build.yml` | Сборка Debug и Release параллельно (матрица) | `app-Debug`, `app-Release` — `App.exe` и `config.json` |
+| `tests` | `.github/workflows/tests.yml` | Тесты под AddressSanitizer, обычные тесты, покрытие с порогом 70% | `test-report` (также в Summary запуска), `coverage-report` — HTML-отчёт покрытия |
+| `code-quality` | `.github/workflows/code-quality.yml` | Форматирование (`clang-format` 20.1.8), статический анализ (`clang-tidy`) | — |
+| `docs` | `.github/workflows/docs.yml` | Сборка Doxygen + MkDocs; публикация на GitHub Pages только при `push` в `master` | сайт документации |
 
-- `app-release` — `App.exe` и `config.json` из Release-сборки;
-- `test-report` — отчёт тестов (также публикуется в Summary запуска);
-- `coverage-report` — HTML-отчёт покрытия.
+Пакеты Conan кэшируются (`actions/cache`) по хэшу `conanfile.txt` и `profiles/`:
+пока эти файлы не меняются, зависимости восстанавливаются из кэша, а не собираются заново.
 
 ```powershell
 # Download the release build of the latest run
-gh run download --name app-release --dir ..\from-ci
+gh run download --name app-Release --dir ..\from-ci
 ```
