@@ -11,11 +11,11 @@ jobs:
   tests:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install Conan
         run: pip install conan
       - name: Cache Conan packages
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.conan2/p
           key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt', 'profiles/**') }}
@@ -30,19 +30,19 @@ jobs:
       - name: Measure coverage
         run: python automation/run_coverage.py --min 70
       - name: Upload coverage report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage-report
           path: build/coverage/html
       - name: Upload test report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-report
           path: build/test-report.xml
       - name: Publish test report
-        uses: phoenix-actions/test-reporting@v10
+        uses: phoenix-actions/test-reporting@v16  
         if: always()
         with:
           name: Test results

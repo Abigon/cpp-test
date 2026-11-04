@@ -11,7 +11,7 @@ jobs:
   docs:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install Doxygen
         run: choco install doxygen.install -y --no-progress
       - name: Install MkDocs
@@ -19,7 +19,7 @@ jobs:
       - name: Build documentation
         run: python automation/build_docs.py
       - name: Upload documentation
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: build/docs/site
 
@@ -36,4 +36,4 @@ jobs:
     steps:
       - name: Publish to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
