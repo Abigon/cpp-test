@@ -74,6 +74,23 @@ python automation/run_tidy.py
 
 ## Документация
 
+Опубликованная документация: https://abigon.github.io/cpp-test/
+
+- **Справочник API** генерируется Doxygen из комментариев `///` в заголовочных
+  файлах `src/App` (конфигурация — `Doxyfile`).
+- **Страницы о проекте** (обзор, архитектура, руководство разработчика) —
+  Markdown-файлы в `docs/`, сайт из них собирает MkDocs (конфигурация — `mkdocs.yml`).
+
+Сайт публикуется на GitHub Pages автоматически при каждом push в `master`.
+
+```powershell
+# Build the API reference and the site into build/docs/site
+python automation/build_docs.py
+
+# Local preview with live reload at http://127.0.0.1:8000
+python automation/build_docs.py --serve
+```
+
 ## Структура проекта
 
 ```text
