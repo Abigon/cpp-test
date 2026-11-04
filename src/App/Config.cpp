@@ -24,8 +24,7 @@ const nlohmann::json& require(const nlohmann::json& object, std::string_view key
 AppConfig parseConfig(std::istream& input)
 {
     nlohmann::json json;
-    try
-    {
+    try    {
         json = nlohmann::json::parse(input);
     }
     catch (const nlohmann::json::parse_error& e)
