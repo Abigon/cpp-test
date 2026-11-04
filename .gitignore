@@ -1,6 +1,7 @@
 build/
 .vs/
 build-asan/
+docs/api/
 
 CMakeUserPresets.json
 __pycache__/

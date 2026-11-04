@@ -1,0 +1,16 @@
+site_name: App
+site_description: Учебный проект курса «Инженерный C++»
+docs_dir: docs
+site_dir: build/docs/site
+theme:
+  name: material
+  language: ru
+nav:
+  - Обзор: index.md
+  - Архитектура: architecture.md
+  - Разработка: development.md
+  - Справочник API: api/index.html
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+  
