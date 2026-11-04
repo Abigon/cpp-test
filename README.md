@@ -121,6 +121,42 @@ python automation/run_coverage.py --min 70
 Порог защищает от деградации и не требует 100% — недостижимые строки
 (скобки после `throw`) не покрываются никогда.
 
+## AddressSanitizer
+
+AddressSanitizer (ASan) находит ошибки памяти во время выполнения: выход за границы
+буфера, обращение к освобождённой памяти, повторное освобождение. Компилятор
+добавляет проверку к каждому обращению к памяти, и при недопустимом доступе программа
+сразу останавливается с отчётом: тип ошибки, строка с ошибкой и место, где был
+выделен буфер.
+
+Инструментированная сборка работает медленнее и требует больше памяти, поэтому она
+вынесена в отдельный каталог `build-asan/` и не смешивается с обычной сборкой в `build/`.
+Включается она опцией CMake `ENABLE_ASAN` (по умолчанию `OFF`) из модуля
+`cmake/Sanitizers.cmake`; функция `enable_sanitizers` применяется ко всем целям
+(`AppLib`, `App`, `AppTestRunner`). Файл тулчейна Conan берётся общий, из `build/`.
+
+Запуск:
+
+```powershell
+# Сборка в build-asan/ и запуск всех тестов под AddressSanitizer
+python automation/run_asan.py
+```
+
+Особенности сборки на MSVC:
+
+- флаг `/RTC1` убирается из Debug-флагов: он несовместим с `/fsanitize=address`;
+- задан `_DISABLE_STL_ANNOTATION`: GoogleTest из Conan собран без ASan, и без этого
+  определения компоновка завершается ошибкой `LNK2038`;
+- рантайм `clang_rt.asan_dynamic-x86_64.dll` копируется рядом с каждым исполняемым
+  файлом после сборки, поэтому тесты запускаются из любой консоли.
+
+Для работы нужен компонент Visual Studio «C++ AddressSanitizer».
+
+В CI шаг `Tests under AddressSanitizer` выполняется сразу после `Build Debug` и до
+`Run tests`. При ошибке памяти запуск сразу падает с отчётом ASan в логе. Если бы первыми
+шли обычные тесты, Debug-сборка открыла бы окно отладочной кучи, и раннер
+завис бы до тайм-аута.
+
 ## Непрерывная интеграция (CI)
 
 Сборка проекта автоматизирована через GitHub Actions: сценарий `.github/workflows/build.yml`
@@ -131,6 +167,7 @@ python automation/run_coverage.py --min 70
 - установка Conan 2 и `clang-format` фиксированной версии (той же, что используется локально);
 - генерация зависимостей и файлов проекта: `python automation/generate_project_files.py`;
 - сборка конфигураций Debug и Release: `python automation/build_debug.py`, `python automation/build_release.py`;
+- тесты под AddressSanitizer: `python automation/run_asan.py` — выполняется до обычных тестов, сборка падает при любой ошибке памяти;
 - запуск тестов: `python automation/run_tests.py`; отчёт публикуется в Summary запуска и сохраняется артефактом `test-report`;
 - измерение покрытия: `python automation/run_coverage.py --min 70` — сборка падает, если покрытие ниже 70%; таблица публикуется в Summary запуска, HTML-отчёт сохраняется артефактом `coverage-report`;
 - проверка стиля кода: `python automation/format_files.py --check` — сборка падает, если код не отформатирован;
