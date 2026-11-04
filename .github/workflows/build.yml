@@ -39,3 +39,38 @@ jobs:
           path: |
             build/bin/${{ matrix.configuration }}/App.exe
             config.json
+
+  linux:
+    name: linux-${{ matrix.configuration }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - configuration: Debug
+            script: build_debug.py
+          - configuration: Release
+            script: build_release.py
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install GCC 14 and Conan
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++-14
+          pipx install conan
+      - name: Cache Conan packages
+        uses: actions/cache@v6
+        with:
+          path: ~/.conan2/p
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt', 'profiles/**') }}
+      - name: Generate project files
+        run: python3 automation/generate_project_files.py
+      - name: Build ${{ matrix.configuration }}
+        run: python3 automation/${{ matrix.script }}
+      - name: Upload app
+        uses: actions/upload-artifact@v7
+        with:
+          name: app-linux-${{ matrix.configuration }}
+          path: |
+            build/${{ matrix.configuration }}/bin/App
+            config.json

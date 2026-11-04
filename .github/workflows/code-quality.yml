@@ -29,3 +29,22 @@ jobs:
         run: python automation/format_files.py --check
       - name: Static analysis
         run: python automation/run_tidy.py
+
+  linux-tidy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install GCC 14, clang-tidy and Conan
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++-14 clang-tidy
+          pipx install conan
+      - name: Cache Conan packages
+        uses: actions/cache@v6
+        with:
+          path: ~/.conan2/p
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt', 'profiles/**') }}
+      - name: Generate project files
+        run: python3 automation/generate_project_files.py
+      - name: Static analysis
+        run: python3 automation/run_tidy.py

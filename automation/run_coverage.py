@@ -16,12 +16,12 @@ import sys
 import xml.etree.ElementTree as ElementTree
 from pathlib import Path
 
-from common import BUILD_DIR, PROJECT_ROOT, build, run
+from common import IS_WINDOWS, PROJECT_ROOT, bin_dir, build, build_dir, run
 
 KNOWN_PATHS = [Path(r"C:\Program Files\OpenCppCoverage\OpenCppCoverage.exe")]
-COVERAGE_DIR = BUILD_DIR / "coverage"
+COVERAGE_DIR = build_dir("Debug") / "coverage"
 REPORT_XML = COVERAGE_DIR / "coverage.xml"
-TEST_RUNNER = BUILD_DIR / "bin" / "Debug" / "AppTestRunner.exe"
+TEST_RUNNER = bin_dir("Debug") / "AppTestRunner.exe"
 
 
 def find_tool() -> str:
@@ -55,6 +55,10 @@ def coverage_table() -> tuple[float, list[tuple[str, float, int, int]]]:
 
 
 def main() -> None:
+    if not IS_WINDOWS:
+        print("coverage is measured on Windows only, skipping")
+        sys.exit(0)
+
     build("Debug")
     tool = find_tool()
     COVERAGE_DIR.mkdir(parents=True, exist_ok=True)

@@ -6,7 +6,11 @@
             "build-Release",
             "tests",
             "code-quality",
-            "docs"
+            "docs",
+            "linux-Debug",
+            "linux-Release",
+            "linux-tests",
+            "linux-tidy"
         ]
     },
     "enforce_admins": true,

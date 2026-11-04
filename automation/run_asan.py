@@ -7,12 +7,12 @@ Usage:
     python automation/run_asan.py
 """
 
-from common import PROJECT_ROOT, TOOLCHAIN, ensure_generated, run
+from common import build_dir, cmake_build, configure, ensure_generated, relative, run
 
-ASAN_BUILD_DIR = PROJECT_ROOT / "build-asan"
+ASAN_BUILD_DIR = build_dir("Debug", root="build-asan")
 
-ensure_generated()
-run(["cmake", "-S", ".", "-B", ASAN_BUILD_DIR.name,
-     f"-DCMAKE_TOOLCHAIN_FILE={TOOLCHAIN}", "-DENABLE_ASAN=ON"])
-run(["cmake", "--build", ASAN_BUILD_DIR.name, "--config", "Debug"])
-run(["ctest", "--test-dir", ASAN_BUILD_DIR.name, "-C", "Debug", "--output-on-failure"])
+ensure_generated("Debug")
+configure("Debug", ASAN_BUILD_DIR, ["-DENABLE_ASAN=ON"])
+cmake_build(ASAN_BUILD_DIR, "Debug")
+run(["ctest", "--test-dir", relative(ASAN_BUILD_DIR), "-C", "Debug", "--output-on-failure"])
+    
