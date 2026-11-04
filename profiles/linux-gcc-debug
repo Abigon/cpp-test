@@ -1,0 +1,13 @@
+[settings]
+arch=x86_64
+build_type=Debug
+compiler=gcc
+compiler.cppstd=23
+compiler.libcxx=libstdc++11
+compiler.version=14
+os=Linux
+
+[conf]
+# Ubuntu 24.04 ships GCC 13 as `g++`; std::println needs GCC 14, installed as g++-14.
+# Conan builds packages with it and writes it into the CMake toolchain.
+tools.build:compiler_executables={"c": "gcc-14", "cpp": "g++-14"}
