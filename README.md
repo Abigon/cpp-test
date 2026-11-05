@@ -96,7 +96,8 @@ python automation/run_tidy.py
 
 - правила форматирования — `.clang-format` (на основе стиля Microsoft);
 - правила анализатора — `.clang-tidy`, любая находка — ошибка;
-- предупреждения компилятора — ошибки (`/W4 /WX`), см. `cmake/CompilerWarnings.cmake`.
+- предупреждения компилятора — ошибки: MSVC `/W4 /WX /permissive-`, GCC
+  `-Wall -Wextra -Wpedantic -Werror`, см. `cmake/CompilerWarnings.cmake`.
 
 ## Документация
 
@@ -116,6 +117,22 @@ python automation/build_docs.py
 # Local preview with live reload at http://127.0.0.1:8000
 python automation/build_docs.py --serve
 ```
+
+## Новый проект по образцу
+
+Каркас этого проекта описан спецификацией [`SCAFFOLD.md`](SCAFFOLD.md): структура,
+сборка, скрипты, проверки качества, документация и CI. Скилл `new-cpp-project`
+(`.claude/skills/new-cpp-project/SKILL.md`, для Antigravity — `.agents/skills.json`)
+генерирует по ней новый проект и проверяет его теми же скриптами `automation/`.
+
+Запуск — в сессии AI-агента, открытой в корне этого репозитория:
+
+```text
+/new-cpp-project <Name> <каталог>
+```
+
+Например, `/new-cpp-project Sandbox ../sandbox`. Требования к каркасу меняются только
+в `SCAFFOLD.md`, а не в сгенерированных файлах.
 
 ## Структура проекта
 
@@ -137,9 +154,11 @@ project/
 
 ## Непрерывная интеграция (CI)
 
-CI состоит из четырёх независимых workflow. Все они запускаются на `windows-latest`
-и `ubuntu-latest` при `push` в `master` и при каждом Pull Request, выполняются
-параллельно и падают независимо друг от друга. У каждого свой статус и свой бейдж.
+CI состоит из четырёх независимых workflow. Все они запускаются при `push` в `master`
+и при каждом Pull Request, выполняются параллельно и падают независимо друг от друга.
+У каждого свой статус и свой бейдж. Раннеры: `build`, `tests` и `code-quality` — на
+`windows-latest` и `ubuntu-latest`; `docs` собирается на `windows-latest`, публикация
+(`deploy`) выполняется на `ubuntu-latest`.
 
 | Workflow | Файл | Что проверяет | Артефакты |
 |---|---|---|---|

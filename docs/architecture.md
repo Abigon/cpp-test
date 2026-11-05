@@ -1,7 +1,8 @@
 # Архитектура
 
 Корневой `CMakeLists.txt` задаёт общие настройки: стандарт C++23, зависимости Conan
-(`nlohmann_json`, `GTest`), единый каталог вывода `build/bin/<Config>/` и подключение
+(`nlohmann_json`, `GTest`), единый каталог вывода (`build/bin/<Config>/` на Windows, `build/<Config>/bin/` на Linux,
+см. таблицу в [Разработка](development.md)) и подключение
 модулей из `cmake/`. Сборочные цели описаны в подпроекте `src/App`
 (`add_subdirectory(src/App)`).
 

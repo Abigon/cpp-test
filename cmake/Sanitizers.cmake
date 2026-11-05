@@ -1,7 +1,7 @@
 # AddressSanitizer support. Off by default: an instrumented build is slower
 # and lives in its own build directory (see automation/run_asan.py).
 
-option(ENABLE_ASAN "Build with AddressSanitizer" OFF)
+option(ENABLE_ASAN "Build with AddressSanitizer (plus UBSan on GCC/Clang)" OFF)
 
 if(ENABLE_ASAN AND MSVC)
     # CMake's default Debug flags include /RTC1 (runtime checks), which is

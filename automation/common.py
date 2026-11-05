@@ -16,6 +16,7 @@ import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_NAME = "App"  # the only place in automation/ that names the project
 PROFILES_DIR = PROJECT_ROOT / "profiles"
 IS_WINDOWS = sys.platform == "win32"
 

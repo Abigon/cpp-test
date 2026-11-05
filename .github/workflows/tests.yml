@@ -42,7 +42,7 @@ jobs:
           name: test-report
           path: build/test-report.xml
       - name: Publish test report
-        uses: phoenix-actions/test-reporting@v16  
+        uses: phoenix-actions/test-reporting@v16
         if: always()
         with:
           name: Test results
